@@ -1,6 +1,6 @@
 {
   "name": "array-every-x",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Tests that all elements in the array pass the provided function.",
   "homepage": "https://github.com/Xotic750/array-every-x",
   "author": {

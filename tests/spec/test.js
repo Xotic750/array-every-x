@@ -39,7 +39,7 @@ var createArrayLike = function (arr) {
   return o;
 };
 
-describe('forEach', function () {
+describe('every', function () {
   var actual;
   var expected;
   var testSubject;
