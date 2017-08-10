@@ -1,6 +1,6 @@
 /**
  * @file Tests that all elements in the array pass the provided function.
- * @version 1.0.1
+ * @version 1.0.2
  * @author Xotic750 <Xotic750@gmail.com>
  * @copyright  Xotic750
  * @license {@link <https://opensource.org/licenses/MIT> MIT}
@@ -24,7 +24,7 @@ var $every = function every(array, callBack /* , thisArg */) {
 
   var args = [object, wrapped];
   if (arguments.length > 2) {
-    args.push(arguments[2]);
+    args[2] = arguments[2];
   }
 
   return some.apply(void 0, args) === false;
@@ -35,11 +35,11 @@ var $every = function every(array, callBack /* , thisArg */) {
  * by the provided function.
  *
  * @param {array} array - The array to iterate over.
- * @param {Function} callBack - Function to test for each element,
+ * @param {Function} callBack - Function to test for each element.
  * @param {*} [thisArg] - Value to use as this when executing callback.
  * @throws {TypeError} If array is null or undefined.
  * @throws {TypeError} If callBack is not a function.
- * @return {boolean} `true` if the callback function returns a truthy value for
+ * @returns {boolean} `true` if the callback function returns a truthy value for
  *  every array element; otherwise, `false`.
  * @example
  * var every = require('array-every-x');

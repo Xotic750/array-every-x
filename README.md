@@ -23,7 +23,7 @@
 ## array-every-x
 Tests that all elements in the array pass the provided function.
 
-**Version**: 1.0.1  
+**Version**: 1.0.2  
 **Author**: Xotic750 <Xotic750@gmail.com>  
 **License**: [MIT](&lt;https://opensource.org/licenses/MIT&gt;)  
 **Copyright**: Xotic750  
@@ -45,7 +45,7 @@ by the provided function.
 | Param | Type | Description |
 | --- | --- | --- |
 | array | <code>array</code> | The array to iterate over. |
-| callBack | <code>function</code> | Function to test for each element, |
+| callBack | <code>function</code> | Function to test for each element. |
 | [thisArg] | <code>\*</code> | Value to use as this when executing callback. |
 
 **Example**  
