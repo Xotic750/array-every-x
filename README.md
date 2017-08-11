@@ -23,7 +23,7 @@
 ## array-every-x
 Tests that all elements in the array pass the provided function.
 
-**Version**: 1.0.2  
+**Version**: 1.1.0  
 **Author**: Xotic750 <Xotic750@gmail.com>  
 **License**: [MIT](&lt;https://opensource.org/licenses/MIT&gt;)  
 **Copyright**: Xotic750  
