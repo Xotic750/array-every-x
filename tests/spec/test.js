@@ -21,6 +21,9 @@ if (typeof module === 'object' && module.exports) {
   every = returnExports;
 }
 
+var documentElement = typeof document !== 'undefined' && document.documentElement;
+var itHasDocumentElement = documentElement ? it : xit;
+
 // IE 6 - 8 have a bug where this returns false.
 var canDistinguish = 0 in [void 0];
 var undefinedIfNoSparseBug = canDistinguish ? void 0 : {
@@ -218,5 +221,31 @@ describe('every', function () {
 
     expect(typeof listArg).toBe('object');
     expect(Object.prototype.toString.call(listArg)).toBe('[object String]');
+  });
+
+  it('should work with arguments', function () {
+    var argObj = (function () {
+      return arguments;
+    }('1'));
+
+    var callback = jasmine.createSpy('callback');
+    every(argObj, callback);
+    expect(callback).toHaveBeenCalledWith('1', 0, argObj);
+  });
+
+  it('should work with strings', function () {
+    var callback = jasmine.createSpy('callback');
+    var string = '1';
+    every(string, callback);
+    expect(callback).toHaveBeenCalledWith('1', 0, string);
+  });
+
+  itHasDocumentElement('should work wih DOM elements', function () {
+    var fragment = document.createDocumentFragment();
+    var div = document.createElement('div');
+    fragment.appendChild(div);
+    var callback = jasmine.createSpy('callback');
+    every(fragment.childNodes, callback);
+    expect(callback).toHaveBeenCalledWith(div, 0, fragment.childNodes);
   });
 });
