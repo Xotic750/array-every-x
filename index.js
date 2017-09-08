@@ -1,6 +1,6 @@
 /**
  * @file Tests that all elements in the array pass the provided function.
- * @version 2.1.0
+ * @version 2.2.0
  * @author Xotic750 <Xotic750@gmail.com>
  * @copyright  Xotic750
  * @license {@link <https://opensource.org/licenses/MIT> MIT}
@@ -9,11 +9,11 @@
 
 'use strict';
 
-var attempt = require('attempt-x');
 var nativEvery = typeof Array.prototype.every === 'function' && Array.prototype.every;
 
 var isWorking;
 if (nativEvery) {
+  var attempt = require('attempt-x');
   var spy = 0;
   var res = attempt.call([1, 2], nativEvery, function (item) {
     spy += item;
