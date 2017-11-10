@@ -1,6 +1,6 @@
 /**
  * @file Tests that all elements in the array pass the provided function.
- * @version 2.2.0
+ * @version 2.3.0
  * @author Xotic750 <Xotic750@gmail.com>
  * @copyright  Xotic750
  * @license {@link <https://opensource.org/licenses/MIT> MIT}
@@ -9,7 +9,10 @@
 
 'use strict';
 
-var nativEvery = typeof Array.prototype.every === 'function' && Array.prototype.every;
+var cachedCtrs = require('cached-constructors-x');
+var ArrayCtr = cachedCtrs.Array;
+var castObject = cachedCtrs.Object;
+var nativEvery = typeof ArrayCtr.prototype.every === 'function' && ArrayCtr.prototype.every;
 
 var isWorking;
 if (nativEvery) {
@@ -24,7 +27,7 @@ if (nativEvery) {
 
   if (isWorking) {
     spy = '';
-    res = attempt.call(Object('abc'), nativEvery, function (item, index) {
+    res = attempt.call(castObject('abc'), nativEvery, function (item, index) {
       spy += item;
       return index !== 2;
     });
@@ -119,7 +122,7 @@ if (nativEvery) {
   };
 } else {
   var splitIfBoxedBug = require('split-if-boxed-bug-x');
-  var toLength = require('to-length-x');
+  var toLength = require('to-length-x').toLength2018;
   var isUndefined = require('validate.io-undefined');
   var toObject = require('to-object-x');
   var assertIsFunction = require('assert-is-function-x');
