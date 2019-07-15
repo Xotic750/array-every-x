@@ -1,34 +1,13 @@
-let every;
-
-if (typeof module === 'object' && module.exports) {
-  require('es5-shim');
-  require('es5-shim/es5-sham');
-
-  if (typeof JSON === 'undefined') {
-    JSON = {};
-  }
-
-  require('json3').runInContext(null, JSON);
-  require('es6-shim');
-  const es7 = require('es7-shim');
-  Object.keys(es7).forEach(function(key) {
-    const obj = es7[key];
-
-    if (typeof obj.shim === 'function') {
-      obj.shim();
-    }
-  });
-  every = require('../../index.js');
-} else {
-  every = returnExports;
-}
+import every from '../src/array-every-x';
 
 const itHasDoc = typeof document !== 'undefined' && document ? it : xit;
 
 // IE 6 - 8 have a bug where this returns false.
+/* eslint-disable-next-line no-void */
 const canDistinguish = 0 in [void 0];
 const undefinedIfNoSparseBug = canDistinguish
-  ? void 0
+  ? /* eslint-disable-next-line no-void */
+    void 0
   : {
       valueOf() {
         return 0;
@@ -52,6 +31,7 @@ describe('every', function() {
   let testSubject;
   let numberOfRuns;
 
+  /* eslint-disable-next-line jest/no-hooks */
   beforeEach(function() {
     expected = {
       0: 2,
@@ -67,31 +47,36 @@ describe('every', function() {
   });
 
   it('is a function', function() {
+    expect.assertions(1);
     expect(typeof every).toBe('function');
   });
 
   it('should throw when array is null or undefined', function() {
+    expect.assertions(3);
     expect(function() {
       every();
-    }).toThrow();
+    }).toThrowErrorMatchingSnapshot();
 
     expect(function() {
+      /* eslint-disable-next-line no-void */
       every(void 0);
-    }).toThrow();
+    }).toThrowErrorMatchingSnapshot();
 
     expect(function() {
       every(null);
-    }).toThrow();
+    }).toThrowErrorMatchingSnapshot();
   });
 
   it('should pass the correct values along to the callback', function() {
-    const callback = jasmine.createSpy('callback');
+    expect.assertions(1);
+    const callback = jest.fn();
     const array = ['1'];
     every(array, callback);
     expect(callback).toHaveBeenCalledWith('1', 0, array);
   });
 
   it('should not affect elements added to the array after it has begun', function() {
+    expect.assertions(2);
     const arr = [1, 2, 3];
 
     let i = 0;
@@ -108,21 +93,24 @@ describe('every', function() {
   });
 
   it('should set the right context when given none', function() {
-    let context;
+    expect.assertions(1);
+    /* eslint-disable-next-line no-void */
+    let context = void 0;
     every([1], function() {
-      // eslint-disable-next-line no-invalid-this
+      /* eslint-disable-next-line babel/no-invalid-this */
       context = this;
     });
 
     expect(context).toBe(
       function() {
-        // eslint-disable-next-line no-invalid-this
+        /* eslint-disable-next-line babel/no-invalid-this */
         return this;
       }.call(),
     );
   });
 
   it('should return true if the array is empty', function() {
+    expect.assertions(2);
     actual = every([], function() {
       return true;
     });
@@ -137,6 +125,7 @@ describe('every', function() {
   });
 
   it('should return true if it runs to the end', function() {
+    expect.assertions(1);
     actual = [1, 2, 3].every(function() {
       return true;
     });
@@ -144,6 +133,7 @@ describe('every', function() {
   });
 
   it('should return false if it is stopped before the end', function() {
+    expect.assertions(1);
     actual = every([1, 2, 3], function() {
       return false;
     });
@@ -151,6 +141,7 @@ describe('every', function() {
   });
 
   it('should return after 3 elements', function() {
+    expect.assertions(1);
     every(testSubject, function(obj, index) {
       actual[index] = obj;
       numberOfRuns += 1;
@@ -162,11 +153,12 @@ describe('every', function() {
   });
 
   it('should stop after 3 elements using a context', function() {
+    expect.assertions(1);
     const o = {a: actual};
     every(
       testSubject,
       function(obj, index) {
-        // eslint-disable-next-line no-invalid-this
+        /* eslint-disable-next-line babel/no-invalid-this */
         this.a[index] = obj;
         numberOfRuns += 1;
 
@@ -179,6 +171,7 @@ describe('every', function() {
   });
 
   it('should stop after 3 elements in an array-like object', function() {
+    expect.assertions(1);
     const ts = createArrayLike(testSubject);
     every(ts, function(obj, index) {
       actual[index] = obj;
@@ -191,12 +184,13 @@ describe('every', function() {
   });
 
   it('should stop after 3 elements in an array-like object using a context', function() {
+    expect.assertions(1);
     const ts = createArrayLike(testSubject);
     const o = {a: actual};
     every(
       ts,
       function(obj, index) {
-        // eslint-disable-next-line no-invalid-this
+        /* eslint-disable-next-line babel/no-invalid-this */
         this.a[index] = obj;
         numberOfRuns += 1;
 
@@ -209,7 +203,9 @@ describe('every', function() {
   });
 
   it('should have a boxed object as list argument of callback', function() {
-    let listArg;
+    expect.assertions(2);
+    /* eslint-disable-next-line no-void */
+    let listArg = void 0;
     every('foo', function(item, index, list) {
       listArg = list;
     });
@@ -219,27 +215,31 @@ describe('every', function() {
   });
 
   it('should work with arguments', function() {
+    expect.assertions(1);
     const argObj = (function() {
+      /* eslint-disable-next-line prefer-rest-params */
       return arguments;
     })('1');
 
-    const callback = jasmine.createSpy('callback');
+    const callback = jest.fn();
     every(argObj, callback);
     expect(callback).toHaveBeenCalledWith('1', 0, argObj);
   });
 
   it('should work with strings', function() {
-    const callback = jasmine.createSpy('callback');
+    expect.assertions(1);
+    const callback = jest.fn();
     const string = '1';
     every(string, callback);
     expect(callback).toHaveBeenCalledWith('1', 0, string);
   });
 
   itHasDoc('should work wih DOM elements', function() {
+    expect.assertions(1);
     const fragment = document.createDocumentFragment();
     const div = document.createElement('div');
     fragment.appendChild(div);
-    const callback = jasmine.createSpy('callback');
+    const callback = jest.fn();
     every(fragment.childNodes, callback);
     expect(callback).toHaveBeenCalledWith(div, 0, fragment.childNodes);
   });

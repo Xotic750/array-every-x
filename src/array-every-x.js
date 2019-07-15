@@ -1,24 +1,22 @@
-/**
- * @file Tests that all elements in the array pass the provided function.
- * @version 2.3.0.
- * @author Xotic750 <Xotic750@gmail.com>.
- * @copyright  Xotic750.
- * @license {@link <https://opensource.org/licenses/MIT> MIT}
- * @module Array-every-x.
- */
+import attempt from 'attempt-x';
+import splitIfBoxedBug from 'split-if-boxed-bug-x';
+import toLength from 'to-length-x';
+import toObject from 'to-object-x';
+import assertIsFunction from 'assert-is-function-x';
 
-const cachedCtrs = require('cached-constructors-x');
-
-const ArrayCtr = cachedCtrs.Array;
-const castObject = cachedCtrs.Object;
+/** @type {ArrayConstructor} */
+const ArrayCtr = [].constructor;
+/** @type {ObjectConstructor} */
+const castObject = {}.constructor;
+/** @type {BooleanConstructor} */
+const castBoolean = true.constructor;
 const nativEvery = typeof ArrayCtr.prototype.every === 'function' && ArrayCtr.prototype.every;
 
 let isWorking;
 
 if (nativEvery) {
-  const attempt = require('attempt-x');
   let spy = 0;
-  let res = attempt.call([1, 2], nativEvery, function(item) {
+  let res = attempt.call([1, 2], nativEvery, (item) => {
     spy += item;
 
     return true;
@@ -28,7 +26,7 @@ if (nativEvery) {
 
   if (isWorking) {
     spy = '';
-    res = attempt.call(castObject('abc'), nativEvery, function(item, index) {
+    res = attempt.call(castObject('abc'), nativEvery, (item, index) => {
       spy += item;
 
       return index !== 2;
@@ -40,11 +38,12 @@ if (nativEvery) {
   if (isWorking) {
     spy = 0;
     res = attempt.call(
-      (function() {
+      (function getArgs() {
+        /* eslint-disable-next-line prefer-rest-params */
         return arguments;
       })(1, 2, 3),
       nativEvery,
-      function(item, index) {
+      (item, index) => {
         spy += item;
 
         return index !== 1;
@@ -65,7 +64,7 @@ if (nativEvery) {
         length: 4,
       },
       nativEvery,
-      function(item) {
+      (item) => {
         spy += item;
 
         return true;
@@ -83,7 +82,7 @@ if (nativEvery) {
       const fragment = doc.createDocumentFragment();
       const div = doc.createElement('div');
       fragment.appendChild(div);
-      res = attempt.call(fragment.childNodes, nativEvery, function(item) {
+      res = attempt.call(fragment.childNodes, nativEvery, (item) => {
         spy = item;
       });
 
@@ -92,9 +91,9 @@ if (nativEvery) {
   }
 
   if (isWorking) {
-    const isStrict = (function() {
-      // eslint-disable-next-line no-invalid-this
-      return Boolean(this) === false;
+    const isStrict = (function returnIsStrict() {
+      /* eslint-disable-next-line babel/no-invalid-this */
+      return castBoolean(this) === false;
     })();
 
     if (isStrict) {
@@ -102,8 +101,8 @@ if (nativEvery) {
       res = attempt.call(
         [1],
         nativEvery,
-        function() {
-          // eslint-disable-next-line no-invalid-this
+        () => {
+          /* eslint-disable-next-line babel/no-invalid-this */
           spy = typeof this === 'string';
         },
         'x',
@@ -117,17 +116,29 @@ if (nativEvery) {
     spy = {};
     const fn = [
       'return nativEvery.call("foo", function (_, __, context) {',
-      'if (Boolean(context) === false || typeof context !== "object") {',
+      'if (castBoolean(context) === false || typeof context !== "object") {',
       'spy.value = true;}});',
     ].join('');
 
-    // eslint-disable-next-line no-new-func
-    res = attempt(Function('nativEvery', 'spy', fn), nativEvery, spy);
+    /* eslint-disable-next-line no-new-func */
+    res = attempt(Function('nativEvery', 'spy', 'castBoolean', fn), nativEvery, spy);
 
     isWorking = res.threw === false && res.value === false && spy.value !== true;
   }
 }
 
+/**
+ * This method tests whether all elements in the array pass the test implemented
+ * by the provided function.
+ *
+ * @param {Array} array - The array to iterate over.
+ * @param {Function} callBack - Function to test for each element.
+ * @param {*} [thisArg] - Value to use as this when executing callback.
+ * @throws {TypeError} If array is null or undefined.
+ * @throws {TypeError} If callBack is not a function.
+ * @returns {boolean} `true` if the callback function returns a truthy value for
+ *  every array element; otherwise, `false`.
+ */
 let $every;
 
 if (nativEvery) {
@@ -135,18 +146,13 @@ if (nativEvery) {
     const args = [callBack];
 
     if (arguments.length > 2) {
+      /* eslint-disable-next-line prefer-rest-params,prefer-destructuring */
       args[1] = arguments[2];
     }
 
     return nativEvery.apply(array, args);
   };
 } else {
-  const splitIfBoxedBug = require('split-if-boxed-bug-x');
-  const toLength = require('to-length-x').toLength2018;
-  const isUndefined = require('validate.io-undefined');
-  const toObject = require('to-object-x');
-  const assertIsFunction = require('assert-is-function-x');
-
   $every = function every(array, callBack /* , thisArg */) {
     const object = toObject(array);
     // If no callback function or if callback is not a callable function
@@ -156,10 +162,11 @@ if (nativEvery) {
     let thisArg;
 
     if (arguments.length > 2) {
+      /* eslint-disable-next-line prefer-rest-params,prefer-destructuring */
       thisArg = arguments[2];
     }
 
-    const noThis = isUndefined(thisArg);
+    const noThis = typeof thisArg === 'undefined';
     for (let i = 0; i < length; i += 1) {
       if (i in iterable) {
         const item = iterable[i];
@@ -174,24 +181,6 @@ if (nativEvery) {
   };
 }
 
-/**
- * This method tests whether all elements in the array pass the test implemented
- * by the provided function.
- *
- * @param {Array} array - The array to iterate over.
- * @param {Function} callBack - Function to test for each element.
- * @param {*} [thisArg] - Value to use as this when executing callback.
- * @throws {TypeError} If array is null or undefined.
- * @throws {TypeError} If callBack is not a function.
- * @returns {boolean} `true` if the callback function returns a truthy value for
- *  every array element; otherwise, `false`.
- * @example
- * var every = require('array-every-x');.
- *
- * function isBigEnough(element, index, array) {
- *   return element >= 10;
- * }
- * every([12, 5, 8, 130, 44], isBigEnough);   // false
- * every([12, 54, 18, 130, 44], isBigEnough); // true
- */
-module.exports = $every;
+const arrayEvery = $every;
+
+export default arrayEvery;

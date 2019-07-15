@@ -21,40 +21,39 @@
 <a name="module_array-every-x"></a>
 
 ## array-every-x
+
 Tests that all elements in the array pass the provided function.
 
-**Version**: 2.3.0  
-**Author**: Xotic750 <Xotic750@gmail.com>  
-**License**: [MIT](&lt;https://opensource.org/licenses/MIT&gt;)  
-**Copyright**: Xotic750  
 <a name="exp_module_array-every-x--module.exports"></a>
 
 ### `module.exports` ⇒ <code>boolean</code> ⏏
+
 This method tests whether all elements in the array pass the test implemented
 by the provided function.
 
 **Kind**: Exported member  
 **Returns**: <code>boolean</code> - `true` if the callback function returns a truthy value for
- every array element; otherwise, `false`.  
+every array element; otherwise, `false`.  
 **Throws**:
 
 - <code>TypeError</code> If array is null or undefined.
 - <code>TypeError</code> If callBack is not a function.
 
+| Param     | Type                  | Description                                   |
+| --------- | --------------------- | --------------------------------------------- |
+| array     | <code>array</code>    | The array to iterate over.                    |
+| callBack  | <code>function</code> | Function to test for each element.            |
+| [thisArg] | <code>\*</code>       | Value to use as this when executing callback. |
 
-| Param | Type | Description |
-| --- | --- | --- |
-| array | <code>array</code> | The array to iterate over. |
-| callBack | <code>function</code> | Function to test for each element. |
-| [thisArg] | <code>\*</code> | Value to use as this when executing callback. |
+**Example**
 
-**Example**  
 ```js
-var every = require('array-every-x');
+import every from 'array-every-x';
 
 function isBigEnough(element, index, array) {
   return element >= 10;
 }
-every([12, 5, 8, 130, 44], isBigEnough);   // false
-every([12, 54, 18, 130, 44], isBigEnough); // true
+
+console.log(every([12, 5, 8, 130, 44], isBigEnough)); // false
+console.log(every([12, 54, 18, 130, 44], isBigEnough)); // true
 ```
