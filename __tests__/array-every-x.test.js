@@ -3,11 +3,10 @@ import every from '../src/array-every-x';
 const itHasDoc = typeof document !== 'undefined' && document ? it : xit;
 
 // IE 6 - 8 have a bug where this returns false.
-/* eslint-disable-next-line no-void */
+
 const canDistinguish = 0 in [void 0];
 const undefinedIfNoSparseBug = canDistinguish
-  ? /* eslint-disable-next-line no-void */
-    void 0
+  ? void 0
   : {
       valueOf() {
         return 0;
@@ -31,7 +30,6 @@ describe('every', function() {
   let testSubject;
   let numberOfRuns;
 
-  /* eslint-disable-next-line jest/no-hooks */
   beforeEach(function() {
     expected = {
       0: 2,
@@ -58,7 +56,6 @@ describe('every', function() {
     }).toThrowErrorMatchingSnapshot();
 
     expect(function() {
-      /* eslint-disable-next-line no-void */
       every(void 0);
     }).toThrowErrorMatchingSnapshot();
 
@@ -94,7 +91,7 @@ describe('every', function() {
 
   it('should set the right context when given none', function() {
     expect.assertions(1);
-    /* eslint-disable-next-line no-void */
+
     let context = void 0;
     every([1], function() {
       /* eslint-disable-next-line babel/no-invalid-this */
@@ -204,7 +201,7 @@ describe('every', function() {
 
   it('should have a boxed object as list argument of callback', function() {
     expect.assertions(2);
-    /* eslint-disable-next-line no-void */
+
     let listArg = void 0;
     every('foo', function(item, index, list) {
       listArg = list;
@@ -217,7 +214,6 @@ describe('every', function() {
   it('should work with arguments', function() {
     expect.assertions(1);
     const argObj = (function() {
-      /* eslint-disable-next-line prefer-rest-params */
       return arguments;
     })('1');
 
