@@ -2,11 +2,11 @@
 {
   "author": "Graham Fairweather",
   "copywrite": "Copyright (c) 2017",
-  "date": "2019-07-27T14:24:50.236Z",
+  "date": "2019-07-27T19:00:54.982Z",
   "describe": "",
   "description": "Tests that all elements in the array pass the provided function.",
   "file": "array-every-x.js",
-  "hash": "9683a825b36573e47108",
+  "hash": "51c88f92a649cc7f5ba2",
   "license": "MIT",
   "version": "3.0.19"
 }
@@ -1599,6 +1599,7 @@ var assert_is_function_x_esm_assertIsFunction = function assertIsFunction(callba
 
 
 
+
 var ne = [].every;
 var nativeEvery = typeof ne === 'function' && ne;
 
@@ -1667,7 +1668,7 @@ var array_every_x_esm_test5 = function test5() {
 var array_every_x_esm_test6 = function test6() {
   var isStrict = function returnIsStrict() {
     /* eslint-disable-next-line babel/no-invalid-this */
-    return true.constructor(this) === false;
+    return to_boolean_x_esm(this) === false;
   }();
 
   if (isStrict) {
@@ -1684,14 +1685,14 @@ var array_every_x_esm_test6 = function test6() {
 
 var array_every_x_esm_test7 = function test7() {
   var spy = {};
-  var fn = 'return nativeEvery.call("foo", function (_, __, context) {' + 'if (castBoolean(context) === false || typeof context !== "object") {' + 'spy.value = true;}});';
+  var fn = 'return nativeEvery.call("foo", function (_, __, context) {' + 'if (toBoolean(context) === false || typeof context !== "object") {' + 'spy.value = true;}});';
   /* eslint-disable-next-line no-new-func */
 
-  var res = attempt_x_esm(Function('nativeEvery', 'spy', 'castBoolean', fn), nativeEvery, spy, true.constructor);
+  var res = attempt_x_esm(Function('nativeEvery', 'spy', 'toBoolean', fn), nativeEvery, spy, to_boolean_x_esm);
   return res.threw === false && res.value === false && spy.value !== true;
 };
 
-var isWorking = true.constructor(nativeEvery) && array_every_x_esm_test1() && array_every_x_esm_test2() && array_every_x_esm_test3() && array_every_x_esm_test4() && array_every_x_esm_test5() && array_every_x_esm_test6() && array_every_x_esm_test7();
+var isWorking = to_boolean_x_esm(nativeEvery) && array_every_x_esm_test1() && array_every_x_esm_test2() && array_every_x_esm_test3() && array_every_x_esm_test4() && array_every_x_esm_test5() && array_every_x_esm_test6() && array_every_x_esm_test7();
 
 var array_every_x_esm_patchedEvery = function patchedEvery() {
   return function every(array, callBack

@@ -4,6 +4,7 @@ import toLength from 'to-length-x';
 import toObject from 'to-object-x';
 import assertIsFunction from 'assert-is-function-x';
 import requireObjectCoercible from 'require-object-coercible-x';
+import toBoolean from 'to-boolean-x';
 
 const ne = [].every;
 const nativeEvery = typeof ne === 'function' && ne;
@@ -90,7 +91,7 @@ const test5 = function test5() {
 const test6 = function test6() {
   const isStrict = (function returnIsStrict() {
     /* eslint-disable-next-line babel/no-invalid-this */
-    return true.constructor(this) === false;
+    return toBoolean(this) === false;
   })();
 
   if (isStrict) {
@@ -115,16 +116,16 @@ const test7 = function test7() {
   const spy = {};
   const fn =
     'return nativeEvery.call("foo", function (_, __, context) {' +
-    'if (castBoolean(context) === false || typeof context !== "object") {' +
+    'if (toBoolean(context) === false || typeof context !== "object") {' +
     'spy.value = true;}});';
 
   /* eslint-disable-next-line no-new-func */
-  const res = attempt(Function('nativeEvery', 'spy', 'castBoolean', fn), nativeEvery, spy, true.constructor);
+  const res = attempt(Function('nativeEvery', 'spy', 'toBoolean', fn), nativeEvery, spy, toBoolean);
 
   return res.threw === false && res.value === false && spy.value !== true;
 };
 
-const isWorking = true.constructor(nativeEvery) && test1() && test2() && test3() && test4() && test5() && test6() && test7();
+const isWorking = toBoolean(nativeEvery) && test1() && test2() && test3() && test4() && test5() && test6() && test7();
 
 const patchedEvery = function patchedEvery() {
   return function every(array, callBack /* , thisArg */) {
