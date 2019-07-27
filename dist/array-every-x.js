@@ -2,13 +2,13 @@
 {
   "author": "Graham Fairweather",
   "copywrite": "Copyright (c) 2017",
-  "date": "2019-07-27T11:44:56.731Z",
+  "date": "2019-07-27T14:24:50.236Z",
   "describe": "",
   "description": "Tests that all elements in the array pass the provided function.",
   "file": "array-every-x.js",
-  "hash": "a47ca27cdabbe0c2ae4e",
+  "hash": "9683a825b36573e47108",
   "license": "MIT",
-  "version": "3.0.18"
+  "version": "3.0.19"
 }
 */
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -1322,8 +1322,6 @@ var binaryRadix = 2;
 var octalRadix = 8;
 var testCharsCount = 2;
 var to_number_x_esm_ERROR_MESSAGE = 'Cannot convert a Symbol value to a number';
-/** @type {NumberConstructor} */
-
 var to_number_x_esm_castNumber = testCharsCount.constructor;
 var pStrSlice = to_number_x_esm_ERROR_MESSAGE.slice;
 var binaryRegex = /^0b[01]+$/i;
