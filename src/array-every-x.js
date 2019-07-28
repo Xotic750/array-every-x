@@ -141,7 +141,7 @@ const patchedEvery = function patchedEvery() {
   };
 };
 
-const implementation = function implementation() {
+export const implementation = function implementation() {
   return function every(array, callBack /* , thisArg */) {
     const object = toObject(array);
     // If no callback function or if callback is not a callable function

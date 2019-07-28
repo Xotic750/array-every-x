@@ -115,7 +115,7 @@ var patchedEvery = function patchedEvery() {
   };
 };
 
-var implementation = function implementation() {
+export var implementation = function implementation() {
   return function every(array, callBack
   /* , thisArg */
   ) {
@@ -154,7 +154,6 @@ var implementation = function implementation() {
  * @returns {boolean} `true` if the callback function returns a truthy value for
  *  every array element; otherwise, `false`.
  */
-
 
 var $every = isWorking ? patchedEvery() : implementation();
 export default $every;
