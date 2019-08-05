@@ -1,10 +1,9 @@
 import attempt from 'attempt-x';
-import splitIfBoxedBug from 'split-if-boxed-bug-x';
-import toLength from 'to-length-x';
 import toObject from 'to-object-x';
 import assertIsFunction from 'assert-is-function-x';
 import requireObjectCoercible from 'require-object-coercible-x';
 import toBoolean from 'to-boolean-x';
+import any from 'array-any-x';
 var ne = [].every;
 var nativeEvery = typeof ne === 'function' && ne;
 
@@ -19,7 +18,7 @@ var test1 = function test1() {
 
 var test2 = function test2() {
   var spy = '';
-  var res = attempt.call({}.constructor('abc'), nativeEvery, function spyAdd2(item, index) {
+  var res = attempt.call(toObject('abc'), nativeEvery, function spyAdd2(item, index) {
     spy += item;
     return index !== 2;
   });
@@ -122,24 +121,18 @@ export var implementation = function every(array, callBack
   var object = toObject(array); // If no callback function or if callback is not a callable function
 
   assertIsFunction(callBack);
-  var iterable = splitIfBoxedBug(object);
-  var length = toLength(iterable.length);
-  /* eslint-disable-next-line prefer-rest-params,no-void */
 
-  var thisArg = arguments.length > 2 ? arguments[2] : void 0;
-  var noThis = typeof thisArg === 'undefined';
+  var iteratee = function iteratee() {
+    /* eslint-disable-next-line prefer-rest-params */
+    var i = arguments[1];
+    /* eslint-disable-next-line prefer-rest-params,babel/no-invalid-this */
 
-  for (var i = 0; i < length; i += 1) {
-    if (i in iterable) {
-      var item = iterable[i];
+    return i in arguments[2] && callBack.call(this, arguments[0], i, object) === false;
+  };
+  /* eslint-disable-next-line prefer-rest-params */
 
-      if ((noThis ? callBack(item, i, object) : callBack.call(thisArg, item, i, object)) === false) {
-        return false;
-      }
-    }
-  }
 
-  return true;
+  return any(object, iteratee, arguments[2]) === false;
 };
 /**
  * This method tests whether all elements in the array pass the test implemented
