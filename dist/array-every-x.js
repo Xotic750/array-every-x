@@ -2,11 +2,11 @@
 {
   "author": "Graham Fairweather",
   "copywrite": "Copyright (c) 2017",
-  "date": "2019-08-04T19:42:14.322Z",
+  "date": "2019-08-05T11:55:01.050Z",
   "describe": "",
   "description": "Tests that all elements in the array pass the provided function.",
   "file": "array-every-x.js",
-  "hash": "e20b4a9e6252b669c273",
+  "hash": "2eb593bc485f3245ee62",
   "license": "MIT",
   "version": "3.0.20"
 }
@@ -1629,7 +1629,7 @@ var assert_is_function_x_esm_assertIsFunction = function assertIsFunction(callba
 
 
 // CONCATENATED MODULE: ./dist/array-every-x.esm.js
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "implementation", function() { return array_every_x_esm_implementation; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "implementation", function() { return implementation; });
 
 
 
@@ -1710,10 +1710,13 @@ var array_every_x_esm_test6 = function test6() {
 
   if (isStrict) {
     var spy = null;
-    var res = attempt_x_esm.call([1], nativeEvery, function testThis() {
+
+    var testThis = function testThis() {
       /* eslint-disable-next-line babel/no-invalid-this */
       spy = typeof this === 'string';
-    }, 'x');
+    };
+
+    var res = attempt_x_esm.call([1], nativeEvery, testThis, 'x');
     return res.threw === false && res.value === false && spy === true;
   }
 
@@ -1731,48 +1734,44 @@ var array_every_x_esm_test7 = function test7() {
 
 var isWorking = to_boolean_x_esm(nativeEvery) && array_every_x_esm_test1() && array_every_x_esm_test2() && array_every_x_esm_test3() && array_every_x_esm_test4() && array_every_x_esm_test5() && array_every_x_esm_test6() && array_every_x_esm_test7();
 
-var array_every_x_esm_patchedEvery = function patchedEvery() {
-  return function every(array, callBack
-  /* , thisArg */
-  ) {
-    require_object_coercible_x_esm(array);
-    var args = [assert_is_function_x_esm(callBack)];
+var patchedEvery = function every(array, callBack
+/* , thisArg */
+) {
+  require_object_coercible_x_esm(array);
+  var args = [assert_is_function_x_esm(callBack)];
 
-    if (arguments.length > 2) {
-      /* eslint-disable-next-line prefer-rest-params,prefer-destructuring */
-      args[1] = arguments[2];
-    }
+  if (arguments.length > 2) {
+    /* eslint-disable-next-line prefer-rest-params,prefer-destructuring */
+    args[1] = arguments[2];
+  }
 
-    return nativeEvery.apply(array, args);
-  };
+  return nativeEvery.apply(array, args);
 };
 
-var array_every_x_esm_implementation = function implementation() {
-  return function every(array, callBack
-  /* , thisArg */
-  ) {
-    var object = to_object_x_esm(array); // If no callback function or if callback is not a callable function
+var implementation = function every(array, callBack
+/* , thisArg */
+) {
+  var object = to_object_x_esm(array); // If no callback function or if callback is not a callable function
 
-    assert_is_function_x_esm(callBack);
-    var iterable = split_if_boxed_bug_x_esm(object);
-    var length = to_length_x_esm(iterable.length);
-    /* eslint-disable-next-line prefer-rest-params,no-void */
+  assert_is_function_x_esm(callBack);
+  var iterable = split_if_boxed_bug_x_esm(object);
+  var length = to_length_x_esm(iterable.length);
+  /* eslint-disable-next-line prefer-rest-params,no-void */
 
-    var thisArg = arguments.length > 2 ? arguments[2] : void 0;
-    var noThis = typeof thisArg === 'undefined';
+  var thisArg = arguments.length > 2 ? arguments[2] : void 0;
+  var noThis = typeof thisArg === 'undefined';
 
-    for (var i = 0; i < length; i += 1) {
-      if (i in iterable) {
-        var item = iterable[i];
+  for (var i = 0; i < length; i += 1) {
+    if (i in iterable) {
+      var item = iterable[i];
 
-        if ((noThis ? callBack(item, i, object) : callBack.call(thisArg, item, i, object)) === false) {
-          return false;
-        }
+      if ((noThis ? callBack(item, i, object) : callBack.call(thisArg, item, i, object)) === false) {
+        return false;
       }
     }
+  }
 
-    return true;
-  };
+  return true;
 };
 /**
  * This method tests whether all elements in the array pass the test implemented
@@ -1787,7 +1786,7 @@ var array_every_x_esm_implementation = function implementation() {
  *  every array element; otherwise, `false`.
  */
 
-var $every = isWorking ? array_every_x_esm_patchedEvery() : array_every_x_esm_implementation();
+var $every = isWorking ? patchedEvery : implementation;
 /* harmony default export */ var array_every_x_esm = __webpack_exports__["default"] = ($every);
 
 

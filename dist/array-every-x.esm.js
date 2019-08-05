@@ -78,10 +78,13 @@ var test6 = function test6() {
 
   if (isStrict) {
     var spy = null;
-    var res = attempt.call([1], nativeEvery, function testThis() {
+
+    var testThis = function testThis() {
       /* eslint-disable-next-line babel/no-invalid-this */
       spy = typeof this === 'string';
-    }, 'x');
+    };
+
+    var res = attempt.call([1], nativeEvery, testThis, 'x');
     return res.threw === false && res.value === false && spy === true;
   }
 
@@ -99,48 +102,44 @@ var test7 = function test7() {
 
 var isWorking = toBoolean(nativeEvery) && test1() && test2() && test3() && test4() && test5() && test6() && test7();
 
-var patchedEvery = function patchedEvery() {
-  return function every(array, callBack
-  /* , thisArg */
-  ) {
-    requireObjectCoercible(array);
-    var args = [assertIsFunction(callBack)];
+var patchedEvery = function every(array, callBack
+/* , thisArg */
+) {
+  requireObjectCoercible(array);
+  var args = [assertIsFunction(callBack)];
 
-    if (arguments.length > 2) {
-      /* eslint-disable-next-line prefer-rest-params,prefer-destructuring */
-      args[1] = arguments[2];
-    }
+  if (arguments.length > 2) {
+    /* eslint-disable-next-line prefer-rest-params,prefer-destructuring */
+    args[1] = arguments[2];
+  }
 
-    return nativeEvery.apply(array, args);
-  };
+  return nativeEvery.apply(array, args);
 };
 
-export var implementation = function implementation() {
-  return function every(array, callBack
-  /* , thisArg */
-  ) {
-    var object = toObject(array); // If no callback function or if callback is not a callable function
+export var implementation = function every(array, callBack
+/* , thisArg */
+) {
+  var object = toObject(array); // If no callback function or if callback is not a callable function
 
-    assertIsFunction(callBack);
-    var iterable = splitIfBoxedBug(object);
-    var length = toLength(iterable.length);
-    /* eslint-disable-next-line prefer-rest-params,no-void */
+  assertIsFunction(callBack);
+  var iterable = splitIfBoxedBug(object);
+  var length = toLength(iterable.length);
+  /* eslint-disable-next-line prefer-rest-params,no-void */
 
-    var thisArg = arguments.length > 2 ? arguments[2] : void 0;
-    var noThis = typeof thisArg === 'undefined';
+  var thisArg = arguments.length > 2 ? arguments[2] : void 0;
+  var noThis = typeof thisArg === 'undefined';
 
-    for (var i = 0; i < length; i += 1) {
-      if (i in iterable) {
-        var item = iterable[i];
+  for (var i = 0; i < length; i += 1) {
+    if (i in iterable) {
+      var item = iterable[i];
 
-        if ((noThis ? callBack(item, i, object) : callBack.call(thisArg, item, i, object)) === false) {
-          return false;
-        }
+      if ((noThis ? callBack(item, i, object) : callBack.call(thisArg, item, i, object)) === false) {
+        return false;
       }
     }
+  }
 
-    return true;
-  };
+  return true;
 };
 /**
  * This method tests whether all elements in the array pass the test implemented
@@ -155,7 +154,7 @@ export var implementation = function implementation() {
  *  every array element; otherwise, `false`.
  */
 
-var $every = isWorking ? patchedEvery() : implementation();
+var $every = isWorking ? patchedEvery : implementation;
 export default $every;
 
 //# sourceMappingURL=array-every-x.esm.js.map

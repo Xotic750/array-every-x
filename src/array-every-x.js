@@ -51,21 +51,11 @@ const test3 = function test3() {
 
 const test4 = function test4() {
   let spy = 0;
-  const res = attempt.call(
-    {
-      0: 1,
-      1: 2,
-      3: 3,
-      4: 4,
-      length: 4,
-    },
-    nativeEvery,
-    function spyAdd4(item) {
-      spy += item;
+  const res = attempt.call({0: 1, 1: 2, 3: 3, 4: 4, length: 4}, nativeEvery, function spyAdd4(item) {
+    spy += item;
 
-      return true;
-    },
-  );
+    return true;
+  });
 
   return res.threw === false && res.value === true && spy === 6;
 };
@@ -96,15 +86,12 @@ const test6 = function test6() {
 
   if (isStrict) {
     let spy = null;
-    const res = attempt.call(
-      [1],
-      nativeEvery,
-      function testThis() {
-        /* eslint-disable-next-line babel/no-invalid-this */
-        spy = typeof this === 'string';
-      },
-      'x',
-    );
+    const testThis = function testThis() {
+      /* eslint-disable-next-line babel/no-invalid-this */
+      spy = typeof this === 'string';
+    };
+
+    const res = attempt.call([1], nativeEvery, testThis, 'x');
 
     return res.threw === false && res.value === false && spy === true;
   }
@@ -127,42 +114,38 @@ const test7 = function test7() {
 
 const isWorking = toBoolean(nativeEvery) && test1() && test2() && test3() && test4() && test5() && test6() && test7();
 
-const patchedEvery = function patchedEvery() {
-  return function every(array, callBack /* , thisArg */) {
-    requireObjectCoercible(array);
-    const args = [assertIsFunction(callBack)];
+const patchedEvery = function every(array, callBack /* , thisArg */) {
+  requireObjectCoercible(array);
+  const args = [assertIsFunction(callBack)];
 
-    if (arguments.length > 2) {
-      /* eslint-disable-next-line prefer-rest-params,prefer-destructuring */
-      args[1] = arguments[2];
-    }
+  if (arguments.length > 2) {
+    /* eslint-disable-next-line prefer-rest-params,prefer-destructuring */
+    args[1] = arguments[2];
+  }
 
-    return nativeEvery.apply(array, args);
-  };
+  return nativeEvery.apply(array, args);
 };
 
-export const implementation = function implementation() {
-  return function every(array, callBack /* , thisArg */) {
-    const object = toObject(array);
-    // If no callback function or if callback is not a callable function
-    assertIsFunction(callBack);
-    const iterable = splitIfBoxedBug(object);
-    const length = toLength(iterable.length);
-    /* eslint-disable-next-line prefer-rest-params,no-void */
-    const thisArg = arguments.length > 2 ? arguments[2] : void 0;
-    const noThis = typeof thisArg === 'undefined';
-    for (let i = 0; i < length; i += 1) {
-      if (i in iterable) {
-        const item = iterable[i];
+export const implementation = function every(array, callBack /* , thisArg */) {
+  const object = toObject(array);
+  // If no callback function or if callback is not a callable function
+  assertIsFunction(callBack);
+  const iterable = splitIfBoxedBug(object);
+  const length = toLength(iterable.length);
+  /* eslint-disable-next-line prefer-rest-params,no-void */
+  const thisArg = arguments.length > 2 ? arguments[2] : void 0;
+  const noThis = typeof thisArg === 'undefined';
+  for (let i = 0; i < length; i += 1) {
+    if (i in iterable) {
+      const item = iterable[i];
 
-        if ((noThis ? callBack(item, i, object) : callBack.call(thisArg, item, i, object)) === false) {
-          return false;
-        }
+      if ((noThis ? callBack(item, i, object) : callBack.call(thisArg, item, i, object)) === false) {
+        return false;
       }
     }
+  }
 
-    return true;
-  };
+  return true;
 };
 
 /**
@@ -177,6 +160,6 @@ export const implementation = function implementation() {
  * @returns {boolean} `true` if the callback function returns a truthy value for
  *  every array element; otherwise, `false`.
  */
-const $every = isWorking ? patchedEvery() : implementation();
+const $every = isWorking ? patchedEvery : implementation;
 
 export default $every;
