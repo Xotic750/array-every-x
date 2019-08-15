@@ -2,7 +2,7 @@
 {
   "author": "Graham Fairweather",
   "copywrite": "Copyright (c) 2017",
-  "date": "2019-08-14T15:11:57.451Z",
+  "date": "2019-08-15T18:17:30.257Z",
   "describe": "",
   "description": "Tests that all elements in the array pass the provided function.",
   "file": "array-every-x.js",
