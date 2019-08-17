@@ -4,16 +4,20 @@ import assertIsFunction from 'assert-is-function-x';
 import requireObjectCoercible from 'require-object-coercible-x';
 import toBoolean from 'to-boolean-x';
 import any from 'array-any-x';
+import methodize from 'simple-methodize-x';
+import call from 'simple-call-x';
 
 const ne = [].every;
-const nativeEvery = typeof ne === 'function' && ne;
+const nativeEvery = typeof ne === 'function' && methodize(ne);
 
 const test1 = function test1() {
   let spy = 0;
-  const res = attempt.call([1, 2], nativeEvery, function spyAdd1(item) {
-    spy += item;
+  const res = attempt(function attemptee() {
+    return nativeEvery([1, 2], function spyAdd1(item) {
+      spy += item;
 
-    return true;
+      return true;
+    });
   });
 
   return res.threw === false && res.value === true && spy === 3;
@@ -21,10 +25,12 @@ const test1 = function test1() {
 
 const test2 = function test2() {
   let spy = '';
-  const res = attempt.call(toObject('abc'), nativeEvery, function spyAdd2(item, index) {
-    spy += item;
+  const res = attempt(function attemptee() {
+    return nativeEvery(toObject('abc'), function spyAdd2(item, index) {
+      spy += item;
 
-    return index !== 2;
+      return index !== 2;
+    });
   });
 
   return res.threw === false && res.value === false && spy === 'abc';
@@ -32,43 +38,47 @@ const test2 = function test2() {
 
 const test3 = function test3() {
   let spy = 0;
-  const res = attempt.call(
-    (function getArgs() {
+  const res = attempt(function attemptee() {
+    const args = (function getArgs() {
       /* eslint-disable-next-line prefer-rest-params */
       return arguments;
-    })(1, 2, 3),
-    nativeEvery,
-    function spyAdd3(item, index) {
+    })(1, 2, 3);
+
+    return nativeEvery(args, function spyAdd3(item, index) {
       spy += item;
 
       return index !== 1;
-    },
-  );
+    });
+  });
 
   return res.threw === false && res.value === false && spy === 3;
 };
 
 const test4 = function test4() {
   let spy = 0;
-  const res = attempt.call({0: 1, 1: 2, 3: 3, 4: 4, length: 4}, nativeEvery, function spyAdd4(item) {
-    spy += item;
+  const res = attempt(function attemptee() {
+    return nativeEvery({0: 1, 1: 2, 3: 3, 4: 4, length: 4}, function spyAdd4(item) {
+      spy += item;
 
-    return true;
+      return true;
+    });
   });
 
   return res.threw === false && res.value === true && spy === 6;
 };
 
-const test5 = function test5() {
-  const doc = typeof document !== 'undefined' && document;
+const doc = typeof document !== 'undefined' && document;
 
+const test5 = function test5() {
   if (doc) {
     let spy = null;
     const fragment = doc.createDocumentFragment();
     const div = doc.createElement('div');
     fragment.appendChild(div);
-    const res = attempt.call(fragment.childNodes, nativeEvery, function spyAssign(item) {
-      spy = item;
+    const res = attempt(function attemptee() {
+      return nativeEvery(fragment.childNodes, function spyAssign(item) {
+        spy = item;
+      });
     });
 
     return res.threw === false && res.value === false && spy === div;
@@ -77,12 +87,12 @@ const test5 = function test5() {
   return true;
 };
 
-const test6 = function test6() {
-  const isStrict = (function returnIsStrict() {
-    /* eslint-disable-next-line babel/no-invalid-this */
-    return toBoolean(this) === false;
-  })();
+const isStrict = (function returnIsStrict() {
+  /* eslint-disable-next-line babel/no-invalid-this */
+  return toBoolean(this) === false;
+})();
 
+const test6 = function test6() {
   if (isStrict) {
     let spy = null;
     const testThis = function testThis() {
@@ -90,7 +100,9 @@ const test6 = function test6() {
       spy = typeof this === 'string';
     };
 
-    const res = attempt.call([1], nativeEvery, testThis, 'x');
+    const res = attempt(function attemptee() {
+      return nativeEvery([1], testThis, 'x');
+    });
 
     return res.threw === false && res.value === false && spy === true;
   }
@@ -101,12 +113,14 @@ const test6 = function test6() {
 const test7 = function test7() {
   const spy = {};
   const fn =
-    'return nativeEvery.call("foo", function (_, __, context) {' +
+    'return nativeEvery("foo", function (_, __, context) {' +
     'if (toBoolean(context) === false || typeof context !== "object") {' +
     'spy.value = true;}});';
 
-  /* eslint-disable-next-line no-new-func */
-  const res = attempt(Function('nativeEvery', 'spy', 'toBoolean', fn), nativeEvery, spy, toBoolean);
+  const res = attempt(function attemptee() {
+    /* eslint-disable-next-line no-new-func */
+    return Function('nativeEvery', 'spy', 'toBoolean', fn)(nativeEvery, spy, toBoolean);
+  });
 
   return res.threw === false && res.value === false && spy.value !== true;
 };
@@ -114,15 +128,8 @@ const test7 = function test7() {
 const isWorking = toBoolean(nativeEvery) && test1() && test2() && test3() && test4() && test5() && test6() && test7();
 
 const patchedEvery = function every(array, callBack /* , thisArg */) {
-  requireObjectCoercible(array);
-  const args = [assertIsFunction(callBack)];
-
-  if (arguments.length > 2) {
-    /* eslint-disable-next-line prefer-rest-params,prefer-destructuring */
-    args[1] = arguments[2];
-  }
-
-  return nativeEvery.apply(array, args);
+  /* eslint-disable-next-line prefer-rest-params */
+  return nativeEvery(requireObjectCoercible(array), assertIsFunction(callBack), arguments[2]);
 };
 
 export const implementation = function every(array, callBack /* , thisArg */) {
@@ -135,7 +142,7 @@ export const implementation = function every(array, callBack /* , thisArg */) {
     const i = arguments[1];
 
     /* eslint-disable-next-line prefer-rest-params,babel/no-invalid-this */
-    return i in arguments[2] && callBack.call(this, arguments[0], i, object) === false;
+    return i in arguments[2] && call(callBack, this, [arguments[0], i, object]) === false;
   };
 
   /* eslint-disable-next-line prefer-rest-params */

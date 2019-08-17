@@ -54,6 +54,8 @@
     "array-any-x": "^1.1.0",
     "assert-is-function-x": "^3.1.0",
     "attempt-x": "^2.1.0",
+    "simple-call-x": "^1.0.1",
+    "simple-methodize-x": "^1.0.2",
     "require-object-coercible-x": "^2.1.0",
     "to-boolean-x": "^2.1.0",
     "to-object-x": "^2.2.0"
